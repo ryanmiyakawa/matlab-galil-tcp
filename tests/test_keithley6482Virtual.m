@@ -3,9 +3,8 @@
 % Add keithley package
 addpath(genpath(fullfile(cDirThis, '..')));
 
-import keithley.keithley6482.Keithley6482Virtual
 
-inst = Keithley6482Virtual();
+inst = keithley.Keithley6482Virtual();
 inst.init()
 inst.connect()
 inst.identity()

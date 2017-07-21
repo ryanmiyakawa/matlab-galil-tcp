@@ -3,9 +3,11 @@
 % Add keithley package
 addpath(genpath(fullfile(cDirThis, '..')));
 
+
 api = keithley.Keithley6482();
 api.init()
 api.connect()
+
 api.identity()
 
 %{

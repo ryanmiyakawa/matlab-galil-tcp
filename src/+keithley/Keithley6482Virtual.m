@@ -1,4 +1,4 @@
-classdef Keithley6482Virtual < keithley.keithley6482.AbstractKeithley6482
+classdef Keithley6482Virtual < keithley.AbstractKeithley6482
 
     
     properties
