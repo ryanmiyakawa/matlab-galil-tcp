@@ -4,7 +4,8 @@ MATLAB class for serial communication with a Keithley 6482.  As of v1.0.1, it al
 
 # Notes for using tcpclient() network communication to Moxa NPort
 
-## Serial settings on Moxa and Keithley must match
+
+## Serial settings (Baud Rate, Data Bits, etc.) on Moxa and Keithley must match
 
 On the Keithley, 
 
@@ -16,7 +17,14 @@ In a browser, navigate to the IP of the Moxa.  In the web-based configuration to
 1. Click “Serial Settings” -> “Port 1” (or other port) navigation item on the left
 2. Configure the Moxa to communicate with the Keithley using the parameters that were configured on the Keithley hardware.
 
-## Data Packing (When NPort receives data from the Keithely, does it immediately send it out over the network?)
+
+## Use Moxa in TCP Client Mode
+
+From the Moxa Web Inspector, go to “Operating Settings” -> “Port 1” and set the dropdown to “TCP Client” and scroll to the bottom and click “Submit”
+
+For single-serial-port Moxas, the default TCP/IP port is 4001.  The `tcpclient` instance in MATLAB needs to be configured with this port.  For multi-serial-port Moxas, each hardware port is linked to a unique TCP/IP port.  The Port 1 -> 4001; Port 2 -> 4002, etc.  By configuring the MATLAB `tcpclient` instance with the desired TCP/IP port, you route the data to the desired hardware port on the Moxa.
+
+## Data Packing (When NPort Receives Cata from the Keithely, Does it Immediately Send it out Over The Network?)
 
 Serial data sent from the Keithley to the NPort accumulates in the NPort’s serial buffer until one of two things happen
 
@@ -29,6 +37,8 @@ After the enabled criteria is satisfied the data is packed for network transmiss
 The simplest solution is to set `Packing Length` to zero and do not bother with delimeters.  In this case, any time the Keithley sends the NPort serial data, that data is immediately packet for network transmission from Moxa NPort to the MATLAB `tcpclient` instance, increasing the `BytesAvailable` property of the `tcpclient`.  
 
 The downside of this approach is that sometimes a single “response” from the Keithley is separated into multiple network packets from Moxa NPort to the MATLAB `tcpclient`, but this is not a big deal.
+
+### Important Note: The Keithely Still Expects And Returns Terminator Characters
 
 ### Configuring Data Packing to Use Delimiters (Optional)
 
