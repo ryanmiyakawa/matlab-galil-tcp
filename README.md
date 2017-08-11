@@ -30,6 +30,8 @@ The simplest solution is to set `Packing Length` to zero and do not bother with 
 
 The downside of this approach is that sometimes a single “response” from the Keithley is separated into multiple network packets from Moxa NPort to the MATLAB `tcpclient`, but this is not a big deal.
 
+### Configuring Data Packing to Use Delimiters (Optional)
+
 If you want to configure data packing to use delimiters, here is a recommended setup. 
 - Configure the Keithley to use a carriage return terminator. Recall that ASCII is a 8-bit character system (256 characters).  The base10 representation of the carriage return character is 13, which is 0D in hex, or 00001101 in binary.  
 - Once the Keithley is configured to use a carriage return terminator, set the NPort “Operation Settings” -> Data Packing -> Delimiter 1 to “0d” (hex) and enable it.  
