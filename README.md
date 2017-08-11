@@ -1,6 +1,6 @@
 # About
 
-MATLAB class for serial / GPIB communication with a Keithley 6482.  As of v1.0.1, it also supports network communication with a Moxa NPort using the `tcpclient` object.  *This class only implements part of the API that the hardware exposes.* There is an optional user interface that requires the [Matlab Instrument Control](https://github.com/cnanders/matlab-instrument-control) library.  
+MATLAB class for serial communication with a Keithley 6482.  As of v1.0.1, it also supports network communication with a Moxa NPort using the `tcpclient` object.  *This class only implements part of the API that the hardware exposes.* There is an optional user interface that requires the [Matlab Instrument Control](https://github.com/cnanders/matlab-instrument-control) library.  
 
 # Notes for using tcpclient() network communication to Moxa NPort
 
@@ -16,7 +16,7 @@ In a browser, navigate to the IP of the Moxa.  In the web-based configuration to
 1. Click “Serial Settings” -> “Port 1” (or other port) navigation item on the left
 2. Configure the Moxa to communicate with the Keithley using the parameters that were configured on the Keithley hardware.
 
-## Data Packing
+## Data Packing (When NPort receives data from the Keithely, does it immediately send it out over the network?)
 
 Serial data sent from the Keithley to the NPort accumulates in the NPort’s serial buffer until one of two things happen
 
