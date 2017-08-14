@@ -9,7 +9,7 @@ MATLAB class for serial communication with a Keithley 6482.
 
 # Notes for using tcpclient() network communication to Moxa NPort
 
-See [https://github.com/cnanders/moxa-nport-notes](https://github.com/cnanders/moxa-nport-notes)
+See [https://github.com/cnanders/matlab-moxa-nport-notes](https://github.com/cnanders/matlab-moxa-nport-notes)
 
 # Requirements
 
