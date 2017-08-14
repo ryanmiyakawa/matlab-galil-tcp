@@ -11,6 +11,8 @@ MATLAB class for serial communication with a Keithley 6482.
 
 See [https://github.com/cnanders/matlab-moxa-nport-notes](https://github.com/cnanders/matlab-moxa-nport-notes)
 
+The Moxa NPort is set up in TCP Client mode
+
 # Requirements
 
 MATLAB Instrument Control Toolbox (GPIB only, serial protocol does not require the additional toolbox)
