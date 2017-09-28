@@ -98,7 +98,7 @@ classdef Keithley6482 < keithley.AbstractKeithley6482
         
         
         % {logical 1x1}
-        lDebug = false
+        lDebug = true
     end
     methods 
         
@@ -113,6 +113,8 @@ classdef Keithley6482 < keithley.AbstractKeithley6482
                     this.(varargin{k}) = varargin{k + 1};
                 end
             end
+            
+            this.init();
             
         end
         
@@ -135,6 +137,7 @@ classdef Keithley6482 < keithley.AbstractKeithley6482
                        this.msg('init() creating tcpclient instance');
                        this.comm = tcpclient(this.cTcpipHost, this.u16TcpipPort);
                     catch ME
+                        this.msg(getReport(ME));
                         rethrow(ME)
                     end
             end
