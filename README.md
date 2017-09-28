@@ -7,11 +7,11 @@ MATLAB class for serial communication with a Keithley 6482.
 
 *This class only implements part of the API that the hardware exposes.* There is an optional user interface that requires the [Matlab Instrument Control](https://github.com/cnanders/matlab-instrument-control) library.  
 
-# Notes for using tcpclient() network communication to Moxa NPort
+# Notes for using tcpclient() network communication to Moxa NPort in TCP Server Mode
 
 See [https://github.com/cnanders/matlab-moxa-nport-notes](https://github.com/cnanders/matlab-moxa-nport-notes)
 
-The Moxa NPort is set up in TCP Client mode
+The Moxa NPort is set up in TCP Server mode
 
 # Requirements
 
