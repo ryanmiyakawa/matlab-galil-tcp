@@ -98,7 +98,7 @@ classdef Keithley6482 < keithley.AbstractKeithley6482
         
         
         % {logical 1x1}
-        lDebug = true
+        lDebug = false
     end
     methods 
         
