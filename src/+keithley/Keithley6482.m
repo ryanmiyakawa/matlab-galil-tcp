@@ -51,6 +51,10 @@ classdef Keithley6482 < keithley.AbstractKeithley6482
         % {double 1x1} storate for number of calls to getData()
         dCount = 0;
         
+        % Store the latest read values into buffer
+        dReadBuffer = [0,0]
+        uint8ReadTimes = {clock, clock}
+        
         
         % {logical 1x1} use manually created binary data packets with tcpip 
         % uses fwrite instead of fprintf
@@ -437,6 +441,20 @@ classdef Keithley6482 < keithley.AbstractKeithley6482
            % time = toc;
            % fprintf('Read %1.0f time = %1.1f ms\n', this.dCount, time * 1000);
            d = str2double(c);
+        end
+        
+        % Attempt to read from buffer, otherwise read and store in buffer
+        function d = bRead(this, u8Ch)
+            t1 = clock;
+            
+            if etime(t1, this.uint8ReadTimes{u8Ch}) < 3
+                d = this.dReadBuffer(u8Ch);
+            else
+                d = this.read(u8Ch);
+                this.uint8ReadTimes{u8Ch} = t1;
+                this.dReadBuffer(u8Ch) = d;
+            end
+            
         end
         
         
