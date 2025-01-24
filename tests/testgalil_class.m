@@ -31,7 +31,9 @@ g.getAbs(1:2)
 
 
 %% Turn motors on:
+write(com, [uint8('SH B'), uint8(13)]);
 write(com, [uint8('SH C'), uint8(13)]);
+
 raw = read(com, com.BytesAvailable, 'uint8')
 
 
@@ -39,18 +41,22 @@ raw = read(com, com.BytesAvailable, 'uint8')
 g.stop();
 
 
+
 %% Run program
 
-g.writeParameter('posA1', -2000);
-g.writeParameter('posA2', 2000);
+%Set inital state of motors
+g.writeParameter('posA1', 0);
+g.writeParameter('posB1', 0);
 
-g.writeParameter('posB1', -2000);
-g.writeParameter('posB2', 2000);
 
-g.writeParameter('waitA', 1000);
-g.writeParameter('waitB', 1000);
+% Set final state of motors
+g.writeParameter('posA2', 10000);
+g.writeParameter('posB2', -10000);
 
-g.writeParameter('speed', 30000);
+g.writeParameter('waitA', 5000);
+g.writeParameter('waitB', 5000);
+
+g.writeParameter('speed', 50000);
 
 
 
