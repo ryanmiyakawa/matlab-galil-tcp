@@ -26,39 +26,24 @@ classdef GalilTCP2Ch < handle
         % {tcpip 1x1} tcpip connection 
         comm
         
+        axes = [2, 3]
+        
 
         % {double 1x1} - timeout of MATLAB {serial, tcpip, tcpclient} - amount of time it will
         % wait for a response before aborting.  
         dTimeout = 2
         
-        dPLCMax = 10;
-        dPLCMin = 0.01;
-        
-        % {double 1x1} storate for number of calls to getData()
-        dCount = 0;
-        
-        % Store the latest read values into buffer
-        dReadBuffer = [0,0]
-        uint8ReadTimes = {clock, clock}
-        
-        
-        % {logical 1x1} use manually created binary data packets with tcpip 
-        % uses fwrite instead of fprintf
-        lManualPacket = false
-        % {logical 1x1} use manual polling and reading of binary data with 
-        % tcpip (uses fread in a while loop instead of fscanf)
-        lManualPollAndRead = false
         
         
         
         % tcpip config
         % --------------------------------
         % {char 1xm} tcp/ip host
-        cTcpipHost = '192.168.0.3'
+        cTcpipHost = '192.168.10.150'
         
         % {uint16 1x1} tcpip port NPort requires a port of 4001 when in
         % "TCP server" mode
-        u16TcpipPort = uint16(4001)
+        u16TcpipPort = uint16(23)
         
 
         % The tcpclient implmentation must manually build the data packets
@@ -128,6 +113,7 @@ classdef GalilTCP2Ch < handle
             % this out
             
             this.msg('clearBytesAvailable()');
+            pause(0.001);
             
             while this.comm.BytesAvailable > 0
                 cMsg = sprintf(...
@@ -135,25 +121,12 @@ classdef GalilTCP2Ch < handle
                     this.comm.BytesAvailable ...
                 );
                 this.msg(cMsg);
-                fread(this.comm, this.comm.BytesAvailable);
+                read(this.comm, this.comm.BytesAvailable);
             end
         end
         
         
-        function connect(this)
-         
-            
-        end
         
-        function disconnect(this)
-           
-        end
-        
-        function c = identity(this)
-            cCommand = '*IDN?';
-            this.writeAscii(cCommand);
-            c = this.readAscii();
-        end
 
         function stop(this)
             cCommand = 'ST';
@@ -161,86 +134,31 @@ classdef GalilTCP2Ch < handle
         end
 
         function executeWobble(this)
-            this.writeAscii('XQ #wobble');
+            this.writeAscii('XQ#wobble');
         end
 
 
-        function moveAbs(dChannel, dLoc)
-            % moveAbs generates a Galil command for absolute motion.
-            % 
-            % Parameters:
-            %   channel (1 or 2) : The channel to move (1 = A, 2 = B)
-            %   location         : The absolute position to move to
-            %
-            % Returns:
-            %   command          : A string containing the Galil command
-            
-            % Validate input
-            if length(dChannel) == 2 && length(dLoc)
-                % Move both:
-                if ~isnumeric(dChannel) || ~isscalar(dChannel)
-                    error('Channel must be a numeric scalar.');
-                end
-                if ~isnumeric(dLoc) || ~isscalar(dLoc)
-                    error('Location must be a numeric scalar.');
-                end
-                cCommand = sprintf('PA %d,%d; BG A B', dLoc(1), dLoc(2)); % Move channel 1 (A)
-                this.writeAscii(cCommand);
-                return
-            end
-
-            % Move single channel:
-            if ~ismember(dChannel, [1, 2])
-                error('Invalid channel. Must be 1 or 2.');
-            end
-            
-            if ~isnumeric(location) || ~isscalar(location)
-                error('Location must be a numeric scalar.');
-            end
-            
-            % Create the PA command with placeholders for unused axes
-            if dChannel == 1
-                cCommand = sprintf('PA %d,; BG A', dLoc); % Move channel 1 (A)
-            elseif channel == 2
-                cCommand = sprintf('PA ,%d; BG B', dLoc); % Move channel 2 (B)
-            end
-
-            this.writeAscii(cCommand);
+        function moveAbs(this, dChannel, dLoc)
+             this.writeAscii(sprintf('PA%s %d', this.getAxisCommas(dChannel), dLoc));
+             this.writeAscii(sprintf('BG %s', this.getAxisLetter(dChannel)));       
+        end
+        
+        function dVal = readParameter(this, cParamName)
+            dVal = this.readAscii(sprintf('MG %s', cParamName));
+        end
+        function writeParameter(this, cParamName, dVal)
+            this.writeAscii(sprintf('%s=%d', cParamName, dVal));
         end
 
-        function dPositions = getAbs(dChannel)
-            % getAbs queries the current absolute position of one or both channels.
-            %
-            % Parameters:
-            %   dChannel (1, 2, or [1, 2]): The channel(s) to query (1 = A, 2 = B)
-            %
-            % Returns:
-            %   dPositions (numeric): A scalar for a single channel or a 1x2 vector for both
-            
+        function dPositions = getAbs(this, dChannel)
+
             % Validate input
             if ~all(ismember(dChannel, [1, 2]))
                 error('Invalid channel. Must be 1, 2, or [1, 2].');
             end
             
-            % Initialize the position query command
-            if isequal(dChannel, [1, 2])
-                cCommand = 'TP A B'; % Query both channels
-            elseif dChannel == 1
-                cCommand = 'TP A';   % Query channel 1 (A)
-            elseif dChannel == 2
-                cCommand = 'TP B';   % Query channel 2 (B)
-            end
-            
-            % Send the command to the Galil controller
-            response = this.readAscii(cCommand); % Replace with your TCP read method
-            
-            % Parse the response
-            dPositions = str2double(strsplit(response, ',')); % Convert to numeric array
-            
-            % If a single channel is queried, return a scalar
-            if length(dPositions) == 1
-                dPositions = dPositions(1);
-            end
+            dPositions = this.readAscii('TP B C');
+            dPositions = dPositions(dChannel);
         end
         
         
@@ -256,9 +174,9 @@ classdef GalilTCP2Ch < handle
         % write the command to the tcpip port (the nPort 5150A)
         % using binary (each uint8 is converted to stream of 8 bits, I think)
         function writeAscii(this, cCmd)
-
             u8Cmd = [uint8(cCmd) 13];
             write(this.comm, u8Cmd);
+            this.clearBytesAvailable();
         end
         
         
@@ -266,17 +184,33 @@ classdef GalilTCP2Ch < handle
         % necessary (tcpip and tcpclient transmit and receive binary data).
         % @return {char 1xm} the ASCII result
         
-        function c = readAscii(this)
-            u8Result = this.readToTerminator(int8(13));
-            % remove carriage return terminator
-            u8Result = u8Result(1 : end - 1);
-            % convert to ASCII (char)
-            c = char(u8Result);
+        function dVal = readAscii(this, cCommand)
+            this.clearBytesAvailable();
+            write(this.comm, [uint8(cCommand), uint8(13)]);
+            pause(0.01);
+            raw = read(this.comm, this.comm.BytesAvailable, 'uint8');
+            valAr = str2double(split(strtrim(char(raw))));
+            if length(valAr) < 2
+                dVal = nan;
+                return
+            end
+            dVal = valAr(1:end-1);
+            
         end
 
-       
+
+        function dLet = getAxisLetter(this, dChannel)
+            dLet = char(64 + this.axes(dChannel));
+        end
         
-        
+        function dLet = getAxisCommas(this, dChannel)
+            dLet = '';
+            
+            for k = 1:this.axes(dChannel)-1
+               dLet = [dLet, ',']; 
+            end
+            
+        end
         
         
     end
@@ -297,7 +231,7 @@ classdef GalilTCP2Ch < handle
         
         function msg(this, cMsg)
             if this.lDebug
-                fprintf('Keithley6482 %s\n', cMsg);
+                fprintf('TCP Galil %s\n', cMsg);
             end
         end
         
