@@ -7,26 +7,26 @@ g = galilTCP.GalilTCP2Ch('cTcpipHost', '192.168.10.150', 'u16TcpipPort',uint16(2
 
 
 %% Read pos B:
-g.getAbs(1)
+g.getAxisAbsolute(1)
 
 
 %% Read pos C:
-g.getAbs(2)
+g.getAxisAbsolute(2)
 
 
 %% Read both:
-g.getAbs(1:2)
+g.getAxisAbsolute(1:2)
 
 
 
 %% Write position
 
-g.moveAbs(1, 1000);
+g.moveAxisAbsolute(1, 1000);
 
-g.moveAbs(2, 1000);
+g.moveAxisAbsolute(2, 1000);
 
 pause(0.5);
-g.getAbs(1:2)
+g.getAxisAbsolute(1:2)
 
 
 
@@ -37,8 +37,8 @@ write(com, [uint8('SH C'), uint8(13)]);
 raw = read(com, com.BytesAvailable, 'uint8')
 
 
-%% stop program
-g.stop();
+%% stopAxisMove program
+g.stopAxisMove();
 
 
 
@@ -65,8 +65,7 @@ g.executeWobble();
 
 
 %% Set encoder value:
-write(com, [uint8('DP,0,0'), uint8(13)]);
-raw = read(com, com.BytesAvailable, 'uint8')
+g.zeroEncoders();
 
 
 

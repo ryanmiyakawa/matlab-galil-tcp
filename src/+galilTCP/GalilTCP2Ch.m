@@ -126,19 +126,41 @@ classdef GalilTCP2Ch < handle
         end
         
         
-        
+        function d = getAxisAnalog(this, u8Axis)
+            if length(this.axes) < (u8Axis + 1)
+                d = 0;
+            else
+                d = this.dVals(u8Axis + 1);
+            end
+        end
 
-        function stop(this)
+
+        function stopAxisMove(this)
             cCommand = 'ST';
             this.writeAscii(cCommand);
+        end
+
+        function l = getAxisIsInitialized(this, u8Axis)
+            l = true;
+        end
+        function l = initializeAxes(this)
+            l = true;
+        end
+
+        function zeroEncoders(this)
+            this.writeAscii('DP,0,0');
+            this.clearBytesAvailable();
         end
 
         function executeWobble(this)
             this.writeAscii('XQ#wobble');
         end
 
+        function l = getAxisIsReady(this, u8Axis)
+            l = true;
+        end
 
-        function moveAbs(this, dChannel, dLoc)
+        function moveAxisAbsolute(this, dChannel, dLoc)
              this.writeAscii(sprintf('PA%s %d', this.getAxisCommas(dChannel), dLoc));
              this.writeAscii(sprintf('BG %s', this.getAxisLetter(dChannel)));       
         end
@@ -150,7 +172,7 @@ classdef GalilTCP2Ch < handle
             this.writeAscii(sprintf('%s=%d', cParamName, dVal));
         end
 
-        function dPositions = getAbs(this, dChannel)
+        function dPositions = getAxisPosition(this, dChannel)
 
             % Validate input
             if ~all(ismember(dChannel, [1, 2]))
