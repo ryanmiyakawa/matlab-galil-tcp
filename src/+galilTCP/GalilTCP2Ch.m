@@ -182,6 +182,16 @@ classdef GalilTCP2Ch < handle
             dPositions = this.readAscii('TP B C');
             dPositions = dPositions(dChannel);
         end
+
+        function turnOnMotors(this)
+            this.writeAscii('SH B');
+            this.writeAscii('SH C');
+        end
+
+        function turnOffMotors(this)
+            this.writeAscii('MO B');
+            this.writeAscii('MO C');
+        end
         
         
         
