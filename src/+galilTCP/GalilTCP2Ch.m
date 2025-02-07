@@ -156,6 +156,11 @@ classdef GalilTCP2Ch < handle
             this.writeAscii('XQ#wobble');
         end
 
+
+        function runProgram(this, cProgram)
+            this.writeAscii(sprintf('XQ#%s', cProgram));
+        end
+
         function l = getAxisIsReady(this, u8Axis)
             l = true;
         end
